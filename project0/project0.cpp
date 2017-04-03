@@ -5,7 +5,7 @@
 * File:         project0.cpp
 * Created:      2017-04-02
 * Modified:     2017-04-02
-* Description:  A simple OpenMP experiment written in C11.
+* Description:  A simple OpenMP experiment written in C++11.
 *
 *               This program times the execution of multiplying
 *               values from two large floating point arrays
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
         double endTime = omp_get_wtime();
 
         // Compute millions of multiply operations per second
-        double megaMults = (double)ARRSIZE / (endTime - startTime) / 1000000.;
+        double megaMults = static_cast<double>(ARRSIZE) / (endTime - startTime) / 1000000.;
         sumMegaMults += megaMults;
 
         // Update max performance if current run is higher
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Compute the average performance for all runs
-    double avgMegaMults = sumMegaMults / (double)RUNCOUNT;
+    double avgMegaMults = sumMegaMults / static_cast<double>(RUNCOUNT);
     printf("   Peak = %8.2lf MegaMults/Sec\n", maxMegaMults);
     printf("Average = %8.2lf MegaMults/Sec\n", avgMegaMults);
 
