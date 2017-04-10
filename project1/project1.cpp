@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
         }
         
         double endTime = ::omp_get_wtime();
-        double megaOps = static_cast<double>(NUMNODES * NUMNODES) / (endTime - startTime) / 1000000.;
+        double megaOps = static_cast<double>(NUMNODES * .000001 * NUMNODES) / (endTime - startTime);
         sumMegaOps += megaOps;
         if (megaOps > maxMegaOps) maxMegaOps = megaOps;
     }
