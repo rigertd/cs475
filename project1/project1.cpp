@@ -78,6 +78,8 @@ float Height(int, int);
 #ifndef NUMNODES
 #define NUMNODES 10
 #endif
+// Define number of times to run the operation
+#define RUNCOUNT 100
 
 // Stores number of threads
 int numThreads;
@@ -125,27 +127,48 @@ int main(int argc, char *argv[])
 
     // Set number of threads based on command line argument
     ::omp_set_num_threads(numThreads);
-    std::cout << "Using " << numThreads <<  "threads" << std::endl;
+    std::cout << "Using " << numThreads <<  " threads" << std::endl;
+    std::cout << "Using " << NUMNODES << " nodes" << std::endl;
 
-    double maxMegaOperations = 0.;
-    double sumMegaOperations = 0.;
+    double maxMegaOps = 0.;
+    double sumMegaOps = 0.;
 
-    // Calculate volume
     float totalVolume = 0.;
-#pragma omp parallel for collapse(2), default(none), reduction(+: totalVolume)
-    for (int iv = 0; iv < NUMNODES; ++iv)
-    {
-        for (int iu = 0; iu < NUMNODES; ++iu)
-        {
-            float tileArea = ((XMAX - XMIN) / static_cast<float>(NUMNODES - 1)) * ((YMAX - YMIN) / static_cast<float>(NUMNODES - 1));
-            // Halve the result if lowest or highest v 
-            if (iv == 0 || iv == NUMNODES - 1) tileArea /= 2;
-            // Halve the result if lowest or highest u
-            if (iu == 0 || iu == NUMNODES - 1) tileArea /= 2;
-            totalVolume += tileArea;
-        }
-    }
 
+    for (int i = 0; i < RUNCOUNT; ++i)
+    {
+        double startTime = ::omp_get_wtime();
+        
+        // Calculate volume
+        #pragma omp parallel for collapse(2), default(none), reduction(+: totalVolume)
+        for (int iv = 0; iv < NUMNODES; ++iv)
+        {
+            for (int iu = 0; iu < NUMNODES; ++iu)
+            {
+                float tileArea = ((XMAX - XMIN) / static_cast<float>(NUMNODES - 1)) * ((YMAX - YMIN) / static_cast<float>(NUMNODES - 1));
+                // Halve the result if lowest or highest v 
+                if (iv == 0 || iv == NUMNODES - 1) tileArea /= 2;
+                // Halve the result if lowest or highest u
+                if (iu == 0 || iu == NUMNODES - 1) tileArea /= 2;
+                totalVolume += tileArea;
+            }
+        }
+        
+        double endTime = ::omp_get_wtime();
+        double megaOps = static_cast<double>(NUMNODES * NUMNODES) / (endTime - startTime) / 1000000.;
+        sumMegaOps += megaOps;
+        if (megaOps > maxMegaOps) maxMegaOps = megaOps;
+    }
+    
+    double avgMegaOps = sumMegaOps / static_cast<double>(RUNCOUNT);
+    std::cout << std::right << std::setw(10) << "Peak = " 
+              << std::fixed << std::setprecision(2) << maxMegaOps 
+              << " MegaOps/Sec" << std::endl;
+
+    std::cout << std::right << std::setw(10) << "Average = " 
+              << std::fixed << std::setprecision(2) << avgMegaOps 
+              << " MegaOps/Sec" << std::endl;
+              
     return 0;
 }
 
