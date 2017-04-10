@@ -9,7 +9,10 @@
 *
 *               This program calculates the approximate volume of the 3D
 *               space between two objects, times the execution time of the
-*               operation, and prints the results to the console.
+*               operation, and prints the results to the console as a line
+*               of comma separated values in the following order:
+*
+*                   threads, nodes, volume, avg megaops/sec, peak megaops/sec
 *
 *               This program uses the following command-line syntax:
 *
@@ -75,12 +78,12 @@
 // Forward declaration of Height function
 float Height(int, int);
 
-// Define number of nodes as 10 if not defined during compilation
+// Define number of nodes as 100 if not defined during compilation
 #ifndef NUMNODES
-#define NUMNODES 10
+#define NUMNODES 100
 #endif
 // Define number of times to run the operation
-#define RUNCOUNT 100
+#define RUNCOUNT 20
 
 // Stores number of threads
 int numThreads;
@@ -128,8 +131,8 @@ int main(int argc, char *argv[])
 
     // Set number of threads based on command line argument
     ::omp_set_num_threads(numThreads);
-    std::cout << "Using " << numThreads <<  " threads" << std::endl;
-    std::cout << "Using " << NUMNODES << " nodes" << std::endl;
+    //std::cout << "Using " << numThreads <<  " threads" << std::endl;
+    //std::cout << "Using " << NUMNODES << " nodes" << std::endl;
 
     double maxMegaOps = 0.;
     double sumMegaOps = 0.;
@@ -162,10 +165,12 @@ int main(int argc, char *argv[])
         if (megaOps > maxMegaOps) maxMegaOps = megaOps;
     }
     
+    /*
     std::cout << "Total volume = " 
               << std::setprecision(6) << totalVolume << std::endl;
-    
+    */
     double avgMegaOps = sumMegaOps / static_cast<double>(RUNCOUNT);
+    /*
     std::cout << std::right << std::setw(10) << "Peak = " 
               << std::fixed << std::setprecision(2) << maxMegaOps 
               << " MegaOps/Sec" << std::endl;
@@ -173,7 +178,14 @@ int main(int argc, char *argv[])
     std::cout << std::right << std::setw(10) << "Average = " 
               << std::fixed << std::setprecision(2) << avgMegaOps 
               << " MegaOps/Sec" << std::endl;
-              
+    */
+
+    std::cout << numThreads << "," 
+              << NUMNODES << ","
+              << totalVolume << ","
+              << avgMegaOps << ","
+              << maxMegaOps << std::endl;
+
     return 0;
 }
 
