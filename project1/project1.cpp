@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
     }
     
     std::cout << "Total volume = " 
-              << std::fixed << std::setprecision(2) << totalVolume << std::endl;
+              << std::setprecision(6) << totalVolume << std::endl;
     
     double avgMegaOps = sumMegaOps / static_cast<double>(RUNCOUNT);
     std::cout << std::right << std::setw(10) << "Peak = " 
