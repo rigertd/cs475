@@ -13,7 +13,7 @@
 *
 *               This program uses the following command-line syntax:
 *
-*					./prog num_threads
+*                   ./prog num_threads
 ********************************************************************/
 #include <cstdlib>
 #include <iostream>
@@ -21,10 +21,10 @@
 
 #include <omp.h>
 
-#define XMIN	 0.
-#define XMAX	 3.
-#define YMIN	 0.
-#define YMAX	 3.
+#define XMIN     0.
+#define XMAX     3.
+#define YMIN     0.
+#define YMAX     3.
 
 /**
  * Coordinates of the two shapes, TOP and BOT.
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 
     // Set number of threads based on command line argument
     ::omp_set_num_threads(numThreads);
-    std::cout << ("Using %d threads\n", numThreads);
+    std::cout << "Using " << numThreads <<  "threads" << std::endl;
 
     double maxMegaOperations = 0.;
     double sumMegaOperations = 0.;
@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
  * Copied from project 1.
  * (http://web.engr.oregonstate.edu/~mjb/cs575/Projects/proj01.html)
  */
-float Height(int iu, int iv)	// iu,iv = 0 .. numNodes-1
+float Height(int iu, int iv)    // iu,iv = 0 .. numNodes-1
 {
     float u = static_cast<float>(iu) / static_cast<float>(NUMNODES - 1);
     float v = static_cast<float>(iv) / static_cast<float>(NUMNODES - 1);
@@ -184,7 +184,7 @@ float Height(int iu, int iv)	// iu,iv = 0 .. numNodes-1
         + bu2 * (bv0*BOTZ20 + bv1*BOTZ21 + bv2*BOTZ22 + bv3*BOTZ23)
         + bu3 * (bv0*BOTZ30 + bv1*BOTZ31 + bv2*BOTZ32 + bv3*BOTZ33);
 
-    return top - bot;	// if the bottom surface sticks out above the top surface
+    return top - bot;   // if the bottom surface sticks out above the top surface
                         // then that contribution to the overall volume is negative
 }
 
