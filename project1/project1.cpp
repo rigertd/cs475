@@ -155,8 +155,9 @@ int main(int argc, char *argv[])
                 // Halve the result if lowest or highest u
                 if (iu == 0 || iu == NUMNODES - 1) tileArea /= 2;
                 // Multiply by height to get volume
+                float volume = Height(iu, iv) * tileArea;
                 #pragma omp critical
-                totalVolume += Height(iu, iv) * tileArea;
+                totalVolume += volume;
             }
         }
 
