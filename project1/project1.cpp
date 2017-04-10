@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
         }
         // Too big to fit in an int (would probably run out of memory anyway)
         else if (arg > std::numeric_limits<int>::max()) {
-            std::cerr << "num_threads cannot be larger than " 
+            std::cerr << "num_threads cannot be larger than "
                       << std::numeric_limits<int>::max() << "." << std::endl
                       << "Usage: " << argv[0] << " num_threads" << std::endl;
             return 1;
@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
     }
     // Not enough or too many arguments specified
     else {
-        std::cerr << "Syntax error." << std::endl 
+        std::cerr << "Syntax error." << std::endl
                   << "Usage: " << argv[0] << " num_threads" << std::endl;
         return 1;
     }
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
             for (int iu = 0; iu < NUMNODES; ++iu)
             {
                 float tileArea = ((XMAX - XMIN) / static_cast<float>(NUMNODES - 1)) * ((YMAX - YMIN) / static_cast<float>(NUMNODES - 1));
-                // Halve the result if lowest or highest v 
+                // Halve the result if lowest or highest v
                 if (iv == 0 || iv == NUMNODES - 1) tileArea /= 2;
                 // Halve the result if lowest or highest u
                 if (iu == 0 || iu == NUMNODES - 1) tileArea /= 2;
@@ -158,29 +158,29 @@ int main(int argc, char *argv[])
                 totalVolume += Height(iu, iv) * tileArea;
             }
         }
-        
+
         double endTime = ::omp_get_wtime();
-        double megaOps = static_cast<double>(NUMNODES * .000001 * NUMNODES) / (endTime - startTime);
+        double megaOps = static_cast<double>(NUMNODES * NUMNODES) / (endTime - startTime) / 1000000.;
         sumMegaOps += megaOps;
         if (megaOps > maxMegaOps) maxMegaOps = megaOps;
     }
-    
+
     /*
-    std::cout << "Total volume = " 
+    std::cout << "Total volume = "
               << std::setprecision(6) << totalVolume << std::endl;
     */
     double avgMegaOps = sumMegaOps / static_cast<double>(RUNCOUNT);
     /*
-    std::cout << std::right << std::setw(10) << "Peak = " 
-              << std::fixed << std::setprecision(2) << maxMegaOps 
+    std::cout << std::right << std::setw(10) << "Peak = "
+              << std::fixed << std::setprecision(2) << maxMegaOps
               << " MegaOps/Sec" << std::endl;
 
-    std::cout << std::right << std::setw(10) << "Average = " 
-              << std::fixed << std::setprecision(2) << avgMegaOps 
+    std::cout << std::right << std::setw(10) << "Average = "
+              << std::fixed << std::setprecision(2) << avgMegaOps
               << " MegaOps/Sec" << std::endl;
     */
 
-    std::cout << numThreads << "," 
+    std::cout << numThreads << ","
               << NUMNODES << ","
               << totalVolume << ","
               << avgMegaOps << ","
