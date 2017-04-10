@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
 
         // Calculate volume
         totalVolume = 0.;
-        #pragma omp parallel for collapse(2)
+        #pragma omp parallel for collapse(2), default(none), reduction(+: totalVolume)
         for (int iv = 0; iv < NUMNODES; ++iv)
         {
             for (int iu = 0; iu < NUMNODES; ++iu)
@@ -155,9 +155,7 @@ int main(int argc, char *argv[])
                 // Halve the result if lowest or highest u
                 if (iu == 0 || iu == NUMNODES - 1) tileArea /= 2;
                 // Multiply by height to get volume
-                float volume = Height(iu, iv) * tileArea;
-                #pragma omp critical
-                totalVolume += volume;
+                totalVolume += Height(iu, iv) * tileArea;
             }
         }
 
