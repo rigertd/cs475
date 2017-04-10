@@ -133,14 +133,14 @@ int main(int argc, char *argv[])
 
     double maxMegaOps = 0.;
     double sumMegaOps = 0.;
-
     float totalVolume = 0.;
 
     for (int i = 0; i < RUNCOUNT; ++i)
     {
         double startTime = ::omp_get_wtime();
-        
+
         // Calculate volume
+        totalVolume = 0.;
         #pragma omp parallel for collapse(2), default(none), reduction(+: totalVolume)
         for (int iv = 0; iv < NUMNODES; ++iv)
         {
@@ -160,6 +160,9 @@ int main(int argc, char *argv[])
         sumMegaOps += megaOps;
         if (megaOps > maxMegaOps) maxMegaOps = megaOps;
     }
+    
+    std::cout << "Total volume = " 
+              << std::fixed << std::setprecision(2) << totalVolume << std::endl;
     
     double avgMegaOps = sumMegaOps / static_cast<double>(RUNCOUNT);
     std::cout << std::right << std::setw(10) << "Peak = " 
