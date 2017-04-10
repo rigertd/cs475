@@ -17,6 +17,7 @@
 ********************************************************************/
 #include <cstdlib>
 #include <iostream>
+#include <ios>
 #include <limits>
 
 #include <omp.h>
