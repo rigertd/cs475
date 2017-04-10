@@ -151,7 +151,8 @@ int main(int argc, char *argv[])
                 if (iv == 0 || iv == NUMNODES - 1) tileArea /= 2;
                 // Halve the result if lowest or highest u
                 if (iu == 0 || iu == NUMNODES - 1) tileArea /= 2;
-                totalVolume += tileArea;
+                // Multiply by height to get volume
+                totalVolume += Height(iu, iv) * tileArea;
             }
         }
         
