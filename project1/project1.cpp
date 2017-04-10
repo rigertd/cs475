@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
 
         // Calculate volume
         totalVolume = 0.;
-        #pragma omp parallel for collapse(2), default(none)
+        #pragma omp parallel for collapse(2), default(none), shared(totalVolume)
         for (int iv = 0; iv < NUMNODES; ++iv)
         {
             for (int iu = 0; iu < NUMNODES; ++iu)
