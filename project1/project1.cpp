@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
 
     double maxMegaOps = 0.;
     double sumMegaOps = 0.;
-    float totalVolume = 0.;
+    double totalVolume = 0.;
 
     for (int i = 0; i < RUNCOUNT; ++i)
     {
