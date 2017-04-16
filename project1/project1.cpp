@@ -4,7 +4,7 @@
 * Assignment:   Project #1
 * File:         project1.cpp
 * Created:      2017-04-09
-* Modified:     2017-04-10
+* Modified:     2017-04-15
 * Description:  Numeric integration with OpenMP written in C++11.
 *
 *               This program calculates the approximate volume of the 3D
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
     if (argc == 2) {
         char *end;
         // Get number of threads
-        int arg = std::strtol(argv[1], &end, 10);
+        long arg = std::strtol(argv[1], &end, 10);
         // If there are still characters in the buffer, invalid input
         if (*end != '\0') {
             std::cerr << "num_threads must be an integer." << std::endl
