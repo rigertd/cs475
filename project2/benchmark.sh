@@ -11,7 +11,7 @@ do
         echo CHUNKSIZE=$c
         g++ -DSCHEDULING=$s -DCHUNKSIZE=$c project2.cpp -o prog -O1 -lm -fopenmp
         # Number of threads
-        for t in 1 2 4 6 8 10 12 16
+        for t in 1 2 4 6 8 10 12 14 16
         do
             echo NUMT=$t
             ./prog $t >> project2.csv
