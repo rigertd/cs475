@@ -81,8 +81,7 @@ const float RANDOM_TEMP =               10.0;   // plus or minus noise
 const float MIDTEMP =                   40.0;
 const float MIDPRECIP =                 10.0;
 
-const float ZERO =                      0.0;
-const float HUNDRED =                   100.0;
+const float FIRE_THRESHOLD =            60.0;
 
 // We only need a fixed number of threads
 const int numThreads = 4;
@@ -290,13 +289,21 @@ void BrushFire()
             state.extraGrowthMonthsLeft--;
         }
 
-        // Randomly determine if we have a brush fire based on current temperature and precipitation
-        float fireChance = getRand(ZERO, HUNDRED);
-        if (fireChance < (state.nowTemp - (state.nowPrecip * 4)))
+        // If fire risk is over threshold, randomly determine if we have a brush fire
+        float fireRisk = state.nowTemp - (state.nowPrecip * 2);
+        if (fireRisk > FIRE_THRESHOLD)
         {
-            // Wipe out all grain and set extra growth counter
-            state.nowHeight = 0.;
-            state.extraGrowthMonthsLeft = 2;
+            // Likelihood goes up with higher fireRisk
+            float inverseRisk = 1 / fireRisk;
+            float min = 0.f;
+            float max = 1.f;
+            int chance = getRand(min, max);
+            if (chance < inverseRisk)
+            {
+                // Wipe out all grain and set extra growth counter
+                state.nowHeight = 0.;
+                state.extraGrowthMonthsLeft = 2;
+            }
         }
         #pragma omp barrier
         
