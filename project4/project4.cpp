@@ -4,13 +4,13 @@
 * Assignment:   Project #4
 * File:         project4.cpp
 * Created:      2017-05-04
-* Modified:     2017-05-05
+* Modified:     2017-05-09
 * Description:  False Sharing
 *
 *               This program runs a multithreaded grain growing simulation.
 *               The state of the simulation is output once per month in CSV
 *               format and includes the following information:
-*                   year, month, rain inches, temp, grain height, deer count
+*                   year, month, rain inches, temp, grain height, deer count, brush fire
 *
 *               This program uses the following command-line syntax:
 *
