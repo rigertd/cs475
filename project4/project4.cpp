@@ -60,6 +60,7 @@ struct State
     float   nowTemp;
     float   nowHeight;
     int     nowNumDeer;
+    int     extraGrowthMonthsLeft;
 };
 
 // Global state variable
@@ -126,6 +127,7 @@ int main(int argc, char *argv[])
     state.nowYear = 2017;
     state.nowNumDeer = 1;
     state.nowHeight = 1.;
+    state.extraGrowthMonthsLeft = 0;
 
     // Compute temperature and precipitation (from project notes)
     float ang = (30. * static_cast<float>(state.nowMonth) + 15.) * ( M_PI / 180. );
@@ -206,7 +208,13 @@ void Grain()
         float precipFactor = std::exp(-sqr((state.nowPrecip - MIDPRECIP) / 10.));
         
         // Update height based on growing conditions and number of deer
-        nextHeight += tempFactor * precipFactor * GRAIN_GROWS_PER_MONTH;
+        float heightGrowth = tempFactor * precipFactor * GRAIN_GROWS_PER_MONTH;
+        // Double growth if there was a fire in the last 2 months
+        if (state.extraGrowthMonthsLeft > 0)
+        {
+            heightGrowth *= 2;
+        }
+        nextHeight += heightGrowth;
         nextHeight -= static_cast<float>(state.nowNumDeer) * ONE_DEER_EATS_PER_MONTH;
         nextHeight = nextHeight < 0 ? 0 : nextHeight;
         #pragma omp barrier
@@ -243,7 +251,8 @@ void Watcher()
             << state.nowPrecip << ","
             << state.nowTemp << ","
             << state.nowHeight << ","
-            << state.nowNumDeer << std::endl;
+            << state.nowNumDeer << ","
+            << (state.extraGrowthMonthsLeft > 0 ? 1 : 0) << std::endl;
 
         // Increment time variables
         if (++state.nowMonth > 11)
@@ -275,11 +284,10 @@ void BrushFire()
         // Wait for other threads
         #pragma omp barrier
         
-        // Apply extra growth if extra growth months remain
-        if (extraGrowthMonths > 0)
+        // Decrement global state for extra growth months
+        if (state.extraGrowthMonthsLeft > 0)
         {
-            state.nowHeight += GRAIN_GROWS_PER_MONTH;
-            extraGrowthMonths--;
+            state.extraGrowthMonthsLeft--;
         }
 
         // Randomly determine if we have a brush fire based on current temperature and precipitation
@@ -288,7 +296,7 @@ void BrushFire()
         {
             // Wipe out all grain and set extra growth counter
             state.nowHeight = 0.;
-            extraGrowthMonths = 2;
+            state.extraGrowthMonthsLeft = 2;
         }
         #pragma omp barrier
         
