@@ -252,7 +252,7 @@ void Watcher()
             << state.nowTemp << ","
             << state.nowHeight << ","
             << state.nowNumDeer << ","
-            << (state.extraGrowthMonthsLeft > 0 ? 1 : 0) << std::endl;
+            << (state.extraGrowthMonthsLeft == 2 ? 1 : 0) << std::endl;
 
         // Increment time variables
         if (++state.nowMonth > 11)
