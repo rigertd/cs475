@@ -4,7 +4,7 @@
 * Assignment:   Project #4
 * File:         project4.cpp
 * Created:      2017-05-04
-* Modified:     2017-05-09
+* Modified:     2017-05-11
 * Description:  False Sharing
 *
 *               This program runs a multithreaded grain growing simulation.
@@ -82,6 +82,7 @@ const float MIDTEMP =                   40.0;
 const float MIDPRECIP =                 10.0;
 
 const float FIRE_THRESHOLD =            60.0;
+const int   EXTRA_GROWTH_MONTHS =       3;
 
 // We only need a fixed number of threads
 const int numThreads = 4;
@@ -251,7 +252,7 @@ void Watcher()
             << state.nowTemp << ","
             << state.nowHeight << ","
             << state.nowNumDeer << ","
-            << (state.extraGrowthMonthsLeft == 2 ? 1 : 0) << std::endl;
+            << (state.extraGrowthMonthsLeft == EXTRA_GROWTH_MONTHS ? 1 : 0) << std::endl;
 
         // Increment time variables
         if (++state.nowMonth > 11)
@@ -270,14 +271,16 @@ void Watcher()
 }
 
 // Higher temperatures increase chance of a brush fire that wipes out all grain.
-// However, the ash makes grain grow an extra GRAIN_GROWS_PER_MONTH for the next 2 months.
+// However, the ash makes grain grow an extra GRAIN_GROWS_PER_MONTH 
+// for the next EXTRA_GROWTH_MONTHS months.
 void BrushFire()
 {
     int extraGrowthMonths = 0;
     
     while (state.nowYear < 2023)
     {
-        // Wait for other threads
+        // Store previous grain height in local variable
+        float oldHeight = state.nowHeight;
         #pragma omp barrier
         
         // Wait for other threads
@@ -289,20 +292,18 @@ void BrushFire()
             state.extraGrowthMonthsLeft--;
         }
 
-        // If fire risk is over threshold, randomly determine if we have a brush fire
+        // If fire risk is over threshold, and the grain is not all fresh growth,
+        // randomly determine if we have a brush fire
         float fireRisk = state.nowTemp - (state.nowPrecip * 2);
-        if (fireRisk > FIRE_THRESHOLD)
+        if (oldHeight > 0.f && fireRisk > FIRE_THRESHOLD)
         {
-            // Likelihood goes up with higher fireRisk
-            float inverseRisk = 1 / fireRisk;
-            float min = 0.f;
-            float max = 1.f;
-            int chance = getRand(min, max);
-            if (chance < inverseRisk)
+            // Chance depends on fire risk
+            int result = getRand(0, RAND_MAX);
+            if (result % 100 < fireRisk)
             {
                 // Wipe out all grain and set extra growth counter
                 state.nowHeight = 0.;
-                state.extraGrowthMonthsLeft = 2;
+                state.extraGrowthMonthsLeft = EXTRA_GROWTH_MONTHS;
             }
         }
         #pragma omp barrier
