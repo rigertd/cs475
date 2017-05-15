@@ -119,6 +119,8 @@ int main(int argc, char *argv[])
     // ======= Multiplication and Reduction Tests =======
     // SIMD SSE version
     float runningSum = 0.;
+    maxMegaMults = 0.;
+    sumMegaMults = 0.;
 
     for (int i = 0; i < RUNCOUNT; ++i)
     {
