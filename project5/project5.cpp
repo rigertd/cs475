@@ -147,15 +147,34 @@ int main(int argc, char *argv[])
     sumMegaMults = 0.;
     runningSum = 0.;
 
-    // Non-SIMD version
+    // Non-SIMD version, assembly
     for (int i = 0; i < RUNCOUNT; ++i)
     {
         double startTime = ::omp_get_wtime();
 
+        __asm
+        (
+            "movss	-136(%rbp), %xmm2\n\t"  // Copy running sum to xmm2 register
+        );
         for (int j = 0; j < ARR_SIZE; ++j)
         {
-            runningSum += dA[j] * dB[j];
+            //runningSum += dA[j] * dB[j];
+            __asm
+            (
+                "movl	-124(%rbp), %eax\n\t"
+                "cltq\n\t"
+                "movss	dA(,%rax,4), %xmm1\n\t" // Copy dA[j] value into xmm1 register
+                "movl	-124(%rbp), %eax\n\t"
+                "cltq\n\t"
+                "movss	dB(,%rax,4), %xmm0\n\t" // Copy dB[j] value into xmm0 register
+                "mulss	%xmm1, %xmm0\n\t"       // Multiply xmm1 and xmm0
+                "addss	%xmm0, %xmm2\n\t"       // Add product to running sum in xmm2
+            );
         }
+        __asm
+        (
+            "movss	%xmm2, -136(%rbp)\n\t"      // Copy running sum back into variable
+        );
 
         double endTime = ::omp_get_wtime();
         double megaMults = static_cast<double>(ARR_SIZE) / (endTime - startTime) / 1000000.;
