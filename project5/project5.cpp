@@ -4,7 +4,7 @@
 * Assignment:   Project #5
 * File:         project5.cpp
 * Created:      2017-05-14
-* Modified:     2017-05-14
+* Modified:     2017-05-16
 * Description:  Vectorized Array Multiplication and Reduction using SSE
 *
 *               This program demonstrates the effects of using SSE on
@@ -132,6 +132,7 @@ int main(int argc, char *argv[])
         double megaMults = static_cast<double>(ARR_SIZE) / (endTime - startTime) / 1000000.;
         sumMegaMults += megaMults;
         if (megaMults > maxMegaMults) maxMegaMults = megaMults;
+        std::cout << "SIMD asm running sum: " << runningSum << std::endl;
     }
 
     avgMegaMults = sumMegaMults / static_cast<double>(RUNCOUNT);
@@ -152,34 +153,35 @@ int main(int argc, char *argv[])
     {
         double startTime = ::omp_get_wtime();
 
-        __asm
+        __asm__ __volatile__
         (
-            "movss	-136(%rbp), %xmm2\n\t"  // Copy running sum to xmm2 register
+            "movss	%0, %%xmm2\n\t" // Store running sum in xmm2 register
+            : : "x" (runningSum)
         );
+        
         for (int j = 0; j < ARR_SIZE; ++j)
         {
-            //runningSum += dA[j] * dB[j];
-            __asm
+            __asm__ __volatile__
             (
-                "movl	-124(%rbp), %eax\n\t"
-                "cltq\n\t"
-                "movss	dA(,%rax,4), %xmm1\n\t" // Copy dA[j] value into xmm1 register
-                "movl	-124(%rbp), %eax\n\t"
-                "cltq\n\t"
-                "movss	dB(,%rax,4), %xmm0\n\t" // Copy dB[j] value into xmm0 register
-                "mulss	%xmm1, %xmm0\n\t"       // Multiply xmm1 and xmm0
-                "addss	%xmm0, %xmm2\n\t"       // Add product to running sum in xmm2
+                "movss	%0, %%xmm1\n\t" // Copy dA[j] value into xmm1 register
+                "movss	%1, %%xmm0\n\t" // Copy dB[j] value into xmm0 register
+                "mulss	%%xmm1, %%xmm0\n\t"       // Multiply xmm1 and xmm0
+                "addss	%%xmm0, %%xmm2\n\t"       // Add product to running sum in xmm2
+                : : "x" (dA[j]), "x" (dB[j])
             );
         }
-        __asm
+        
+        __asm__ __volatile__
         (
-            "movss	%xmm2, -136(%rbp)\n\t"      // Copy running sum back into variable
+            "movss	%%xmm2, %0\n\t" // Copy running sum back to main memory
+            : "=x" (runningSum)
         );
 
         double endTime = ::omp_get_wtime();
         double megaMults = static_cast<double>(ARR_SIZE) / (endTime - startTime) / 1000000.;
         sumMegaMults += megaMults;
         if (megaMults > maxMegaMults) maxMegaMults = megaMults;
+        std::cout << "Non-SIMD asm running sum: " << runningSum << std::endl;
     }
 
     avgMegaMults = sumMegaMults / static_cast<double>(RUNCOUNT);
