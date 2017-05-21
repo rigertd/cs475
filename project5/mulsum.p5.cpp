@@ -2,19 +2,22 @@
 
 float MulSum(float *a, float *b, int len)
 {
-    float result = 0.;
-    
-	__asm
+	// Maintain these local variables for fair comparison
+	float sum[4] = { 0., 0., 0., 0. };
+	int limit = len;
+
+	__asm __volatile
 	(
 		".att_syntax\n\t"
-		"movq    -24(%rbp), %rbx\n\t"		// a
-		"movq    -32(%rbp), %rcx\n\t"		// b
-		"movss   -4(%rbp),  %xmm2\n\t"		// result
+		"movq    -40(%rbp), %rbx\n\t"		// a
+		"movq    -48(%rbp), %rcx\n\t"		// b
+		"leaq    -32(%rbp), %rdx\n\t"		// &sum[0]
+		"movss   (%rdx), %xmm2\n\t"		// 1 copy of 0. in xmm2
 	);
 
-	for( int i = 0; i < len; i++ )
+	for( int i = 0; i < limit; i++ )
 	{
-		__asm
+		__asm __volatile
 		(
 			".att_syntax\n\t"
 			"movss	(%rbx), %xmm0\n\t"	// load the first sse register
@@ -26,11 +29,11 @@ float MulSum(float *a, float *b, int len)
 		);
 	}
 
-	__asm
+	__asm __volatile
 	(
 		".att_syntax\n\t"
-		"movss	 %xmm2, -4(%rbp)\n\t"	// copy the sums back to sum[ ]
+		"movss	 %xmm2, (%rdx)\n\t"	// copy the sum back to sum[ ]
 	);
-    
-    return result;
+
+	return sum[0];
 }
