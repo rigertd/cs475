@@ -9,7 +9,7 @@ float MulSum(float *a, float *b, int len)
 		".att_syntax\n\t"
 		"movq    -24(%rbp), %rbx\n\t"		// a
 		"movq    -32(%rbp), %rcx\n\t"		// b
-		"movss   -40(%rbp),  %xmm2\n\t"		// result
+		"movss   -4(%rbp),  %xmm2\n\t"		// result
 	);
 
 	for( int i = 0; i < len; i++ )
@@ -29,7 +29,7 @@ float MulSum(float *a, float *b, int len)
 	__asm
 	(
 		".att_syntax\n\t"
-		"movss	 %xmm2, -40(%rbp)\n\t"	// copy the sums back to sum[ ]
+		"movss	 %xmm2, -4(%rbp)\n\t"	// copy the sums back to sum[ ]
 	);
     
     return result;
