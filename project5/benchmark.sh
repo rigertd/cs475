@@ -7,7 +7,7 @@ echo "SSE","Reduction","Array Size","Avg MegaMults/Sec","Peak MegaMults/Sec" >> 
 for arr in 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152 4194304 6291456 8388608 12582912 16777216 33554432
 do
     echo ARR_SIZE=$arr
-    g++ -std=c++11 -DARR_SIZE=$arr project5.cpp simd.p5.cpp -o prog -lm -fopenmp
+    g++ -std=c++11 -DARR_SIZE=$arr project5.cpp simd.p5.cpp mulsum.p5.cpp -o prog -lm -fopenmp
     ./prog >> project5.csv
 done
 
